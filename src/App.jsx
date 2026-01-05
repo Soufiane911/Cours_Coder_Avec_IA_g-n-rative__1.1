@@ -1,136 +1,162 @@
-import { useState, useEffect } from 'react'
-import './App.css'
-import { loadCSVFromURL } from './utils/csvParser'
-import {
-  getSessionsByLanguage,
-  getSessionsByService,
-  getDurationStats,
-  getGlobalKPIs
-} from './utils/dataAggregations'
+import { useState } from 'react';
+import './index.css';
+import Header from './components/layout/Header';
+import Sidebar from './components/layout/Sidebar';
+import DashboardGrid, { GridItem } from './components/layout/DashboardGrid';
+import Card from './components/ui/Card';
+import KPICard from './components/ui/KPICard';
+import Loader, { SkeletonChart } from './components/ui/Loader';
+import { FilterProvider, useFilters } from './context/FilterContext';
+import useSessionData from './hooks/useSessionData';
+import { getGlobalKPIs, getSessionsByLanguage, getSessionsByService } from './utils/dataAggregations';
 
-function App() {
-  const [sessions, setSessions] = useState([])
-  const [loading, setLoading] = useState(true)
-  const [error, setError] = useState(null)
-  const [stats, setStats] = useState(null)
-
-  useEffect(() => {
-    const loadData = async () => {
-      try {
-        const data = await loadCSVFromURL('/src/data/sessions_dataset_320.csv')
-        setSessions(data)
-
-        // Test des fonctions d'agrégation
-        const kpis = getGlobalKPIs(data)
-        const byLanguage = getSessionsByLanguage(data)
-        const byService = getSessionsByService(data)
-        const duration = getDurationStats(data)
-
-        setStats({ kpis, byLanguage, byService, duration })
-        setLoading(false)
-      } catch (err) {
-        setError(err.message)
-        setLoading(false)
-      }
-    }
-    loadData()
-  }, [])
-
-  if (loading) return <div className="p-8 text-white">Chargement des données...</div>
-  if (error) return <div className="p-8 text-red-500">Erreur: {error}</div>
+/**
+ * Dashboard Content - Composant principal du dashboard
+ */
+const DashboardContent = () => {
+  const { filteredSessions, filters, setFilters } = useFilters();
+  const kpis = getGlobalKPIs(filteredSessions);
+  const topLangues = getSessionsByLanguage(filteredSessions).slice(0, 5);
+  const services = getSessionsByService(filteredSessions);
 
   return (
-    <div className="min-h-screen bg-slate-900 p-8 text-white">
-      <h1 className="text-3xl font-bold mb-6 gradient-text">
-        🏥 Dashaalia - Test Data Layer
-      </h1>
+    <div className="flex flex-1 overflow-hidden">
+      <Sidebar
+        filters={filters}
+        onFilterChange={setFilters}
+        sessions={filteredSessions}
+      />
 
-      {stats && (
-        <div className="space-y-6">
-          {/* KPIs */}
-          <div className="glass-card p-6">
-            <h2 className="text-xl font-semibold mb-4">📊 KPIs Globaux</h2>
-            <div className="grid grid-cols-2 md:grid-cols-5 gap-4">
-              <div className="bg-slate-800 p-4 rounded-lg">
-                <p className="text-slate-400 text-sm">Total Sessions</p>
-                <p className="text-2xl font-bold text-blue-400">{stats.kpis.totalSessions}</p>
-              </div>
-              <div className="bg-slate-800 p-4 rounded-lg">
-                <p className="text-slate-400 text-sm">Durée moyenne</p>
-                <p className="text-2xl font-bold text-purple-400">{stats.kpis.avgDuration} min</p>
-              </div>
-              <div className="bg-slate-800 p-4 rounded-lg">
-                <p className="text-slate-400 text-sm">Qualité moyenne</p>
-                <p className="text-2xl font-bold text-green-400">{stats.kpis.avgQuality}%</p>
-              </div>
-              <div className="bg-slate-800 p-4 rounded-lg">
-                <p className="text-slate-400 text-sm">Note moyenne</p>
-                <p className="text-2xl font-bold text-amber-400">{stats.kpis.avgRating}/5</p>
-              </div>
-              <div className="bg-slate-800 p-4 rounded-lg">
-                <p className="text-slate-400 text-sm">Interactions totales</p>
-                <p className="text-2xl font-bold text-cyan-400">{stats.kpis.totalInteractions}</p>
-              </div>
-            </div>
-          </div>
+      <DashboardGrid>
+        {/* KPI Cards Row */}
+        <GridItem>
+          <KPICard
+            title="Total Sessions"
+            value={kpis.totalSessions}
+            icon="📊"
+            color="blue"
+          />
+        </GridItem>
 
-          {/* Top Langues */}
-          <div className="glass-card p-6">
-            <h2 className="text-xl font-semibold mb-4">🌍 Top Langues</h2>
-            <div className="space-y-2">
-              {stats.byLanguage.slice(0, 5).map((lang, i) => (
+        <GridItem>
+          <KPICard
+            title="Durée moyenne"
+            value={`${kpis.avgDuration} min`}
+            icon="⏱️"
+            color="purple"
+          />
+        </GridItem>
+
+        <GridItem>
+          <KPICard
+            title="Score qualité"
+            value={`${kpis.avgQuality}%`}
+            icon="✨"
+            color="green"
+          />
+        </GridItem>
+
+        <GridItem>
+          <KPICard
+            title="Note moyenne"
+            value={`${kpis.avgRating}/5`}
+            icon="⭐"
+            color="amber"
+          />
+        </GridItem>
+
+        {/* Top Langues Card */}
+        <GridItem colSpan={2}>
+          <Card title="Top Langues" icon="🌍">
+            <div className="space-y-3">
+              {topLangues.map((lang, i) => (
                 <div key={lang.langue} className="flex items-center gap-3">
-                  <span className="text-slate-400 w-6">{i + 1}.</span>
-                  <span className="flex-1">{lang.langue}</span>
-                  <span className="text-blue-400 font-semibold">{lang.count} sessions</span>
+                  <span className="w-6 h-6 flex items-center justify-center bg-blue-500/20 text-blue-400 rounded-full text-xs font-bold">
+                    {i + 1}
+                  </span>
+                  <span className="flex-1 text-white">{lang.langue}</span>
+                  <span className="text-blue-400 font-semibold">{lang.count}</span>
+                  <div className="w-24 bg-slate-700 rounded-full h-2">
+                    <div
+                      className="bg-gradient-to-r from-blue-500 to-purple-500 h-2 rounded-full"
+                      style={{ width: `${(lang.count / topLangues[0].count) * 100}%` }}
+                    />
+                  </div>
                 </div>
               ))}
             </div>
-          </div>
+          </Card>
+        </GridItem>
 
-          {/* Services */}
-          <div className="glass-card p-6">
-            <h2 className="text-xl font-semibold mb-4">🏥 Répartition par Service</h2>
-            <div className="grid grid-cols-2 md:grid-cols-3 gap-3">
-              {stats.byService.map((service) => (
-                <div key={service.service} className="bg-slate-800 p-3 rounded-lg flex justify-between">
-                  <span>{service.service}</span>
-                  <span className="text-purple-400">{service.percentage}%</span>
+        {/* Services Card */}
+        <GridItem colSpan={2}>
+          <Card title="Répartition Services" icon="🏥">
+            <div className="grid grid-cols-2 gap-2">
+              {services.map((service) => (
+                <div key={service.service} className="bg-slate-700/50 p-3 rounded-lg flex justify-between items-center">
+                  <span className="text-sm text-slate-300">{service.service}</span>
+                  <span className="text-purple-400 font-semibold">{service.percentage}%</span>
                 </div>
               ))}
             </div>
-          </div>
+          </Card>
+        </GridItem>
 
-          {/* Durée Stats */}
-          <div className="glass-card p-6">
-            <h2 className="text-xl font-semibold mb-4">⏱️ Statistiques Durée</h2>
-            <div className="grid grid-cols-4 gap-4">
-              <div className="bg-slate-800 p-3 rounded-lg text-center">
-                <p className="text-slate-400 text-sm">Min</p>
-                <p className="text-xl font-bold">{stats.duration.min} min</p>
-              </div>
-              <div className="bg-slate-800 p-3 rounded-lg text-center">
-                <p className="text-slate-400 text-sm">Max</p>
-                <p className="text-xl font-bold">{stats.duration.max} min</p>
-              </div>
-              <div className="bg-slate-800 p-3 rounded-lg text-center">
-                <p className="text-slate-400 text-sm">Moyenne</p>
-                <p className="text-xl font-bold">{stats.duration.avg.toFixed(1)} min</p>
-              </div>
-              <div className="bg-slate-800 p-3 rounded-lg text-center">
-                <p className="text-slate-400 text-sm">Médiane</p>
-                <p className="text-xl font-bold">{stats.duration.median} min</p>
-              </div>
+        {/* Placeholder for future charts */}
+        <GridItem colSpan={2}>
+          <Card title="Évolution Sessions" icon="📈" className="h-64">
+            <div className="flex items-center justify-center h-40 text-slate-500">
+              📊 Graphique Phase 4
             </div>
-          </div>
+          </Card>
+        </GridItem>
 
-          <p className="text-green-400 text-center">
-            ✅ Data Layer fonctionne correctement ! {sessions.length} sessions chargées.
-          </p>
-        </div>
-      )}
+        <GridItem colSpan={2}>
+          <Card title="Indicateurs Qualité" icon="✨" className="h-64">
+            <div className="flex items-center justify-center h-40 text-slate-500">
+              📊 Graphique Phase 4
+            </div>
+          </Card>
+        </GridItem>
+      </DashboardGrid>
     </div>
-  )
+  );
+};
+
+/**
+ * App - Composant racine avec providers
+ */
+function App() {
+  const [darkMode, setDarkMode] = useState(true);
+  const { sessions, loading, error } = useSessionData();
+
+  if (loading) {
+    return (
+      <div className="min-h-screen bg-slate-900 flex items-center justify-center">
+        <Loader size="large" text="Chargement des données..." />
+      </div>
+    );
+  }
+
+  if (error) {
+    return (
+      <div className="min-h-screen bg-slate-900 flex items-center justify-center">
+        <div className="text-center">
+          <p className="text-red-400 text-xl mb-2">❌ Erreur</p>
+          <p className="text-slate-400">{error}</p>
+        </div>
+      </div>
+    );
+  }
+
+  return (
+    <FilterProvider sessions={sessions}>
+      <div className="min-h-screen bg-slate-900 flex flex-col">
+        <Header darkMode={darkMode} setDarkMode={setDarkMode} />
+        <DashboardContent />
+      </div>
+    </FilterProvider>
+  );
 }
 
-export default App
+export default App;
