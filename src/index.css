@@ -1,19 +1,26 @@
 @import "tailwindcss";
 
-/* Custom CSS Variables for Dark Mode */
+@import "tailwindcss";
+
+/* Custom CSS Variables for Modern Blue Theme */
 :root {
-  --bg-primary: #0f172a;
-  --bg-secondary: #1e293b;
-  --bg-card: #334155;
+  --bg-primary: linear-gradient(135deg, #0c1425 0%, #1a2332 50%, #0f172a 100%);
+  --bg-secondary: linear-gradient(135deg, #1e293b 0%, #334155 100%);
+  --bg-card: linear-gradient(135deg, rgba(30, 41, 59, 0.8) 0%, rgba(51, 65, 85, 0.6) 100%);
+  --bg-card-hover: linear-gradient(135deg, rgba(59, 130, 246, 0.1) 0%, rgba(139, 92, 246, 0.05) 100%);
   --text-primary: #f8fafc;
-  --text-secondary: #94a3b8;
+  --text-secondary: #cbd5e1;
   --accent-primary: #3b82f6;
-  --accent-secondary: #8b5cf6;
-  --accent-gradient: linear-gradient(135deg, #3b82f6, #8b5cf6);
-  --border-color: #475569;
+  --accent-secondary: #60a5fa;
+  --accent-tertiary: #93c5fd;
+  --accent-gradient: linear-gradient(135deg, #3b82f6 0%, #60a5fa 50%, #93c5fd 100%);
+  --border-color: rgba(59, 130, 246, 0.3);
+  --border-hover: rgba(59, 130, 246, 0.6);
   --success: #22c55e;
   --warning: #f59e0b;
   --error: #ef4444;
+  --glow-primary: 0 0 20px rgba(59, 130, 246, 0.3);
+  --glow-hover: 0 0 30px rgba(59, 130, 246, 0.5);
 }
 
 * {
@@ -29,13 +36,93 @@ body {
   min-height: 100vh;
 }
 
-/* Glassmorphism Card Style */
-.glass-card {
-  background: rgba(30, 41, 59, 0.7);
-  backdrop-filter: blur(10px);
-  border: 1px solid rgba(71, 85, 105, 0.5);
+/* Modern Chart Styles */
+.chart-container {
+  background: linear-gradient(135deg, rgba(30, 41, 59, 0.8) 0%, rgba(51, 65, 85, 0.6) 100%);
+  backdrop-filter: blur(20px);
+  border: 1px solid rgba(59, 130, 246, 0.3);
   border-radius: 16px;
-  box-shadow: 0 8px 32px rgba(0, 0, 0, 0.2);
+  box-shadow: 0 8px 32px rgba(0, 0, 0, 0.3), 0 0 20px rgba(59, 130, 246, 0.1);
+  transition: all 0.3s ease;
+}
+
+.chart-container:hover {
+  border-color: rgba(59, 130, 246, 0.6);
+  box-shadow: 0 12px 40px rgba(0, 0, 0, 0.4), 0 0 30px rgba(59, 130, 246, 0.2);
+  transform: translateY(-2px);
+}
+
+.chart-title {
+  background: linear-gradient(135deg, #3b82f6 0%, #60a5fa 100%);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+  font-weight: 700;
+  font-size: 1.25rem;
+  margin-bottom: 1rem;
+  text-shadow: 0 0 20px rgba(59, 130, 246, 0.3);
+}
+
+/* Custom Recharts Styling */
+.recharts-cartesian-grid line {
+  stroke: rgba(59, 130, 246, 0.2) !important;
+}
+
+.recharts-cartesian-axis-line {
+  stroke: rgba(59, 130, 246, 0.4) !important;
+}
+
+.recharts-cartesian-axis-tick-value {
+  fill: #cbd5e1 !important;
+  font-size: 12px;
+}
+
+.recharts-tooltip-wrapper {
+  outline: none;
+}
+
+.recharts-tooltip-content {
+  background: linear-gradient(135deg, rgba(30, 41, 59, 0.95) 0%, rgba(51, 65, 85, 0.9) 100%) !important;
+  border: 1px solid rgba(59, 130, 246, 0.5) !important;
+  border-radius: 8px !important;
+  box-shadow: 0 8px 25px rgba(0, 0, 0, 0.3) !important;
+  backdrop-filter: blur(10px) !important;
+}
+
+.recharts-legend-item-text {
+  color: #cbd5e1 !important;
+  font-weight: 500;
+}
+
+/* Chart Animations */
+.chart-animation {
+  animation: chartFadeIn 0.8s ease-out;
+}
+
+@keyframes chartFadeIn {
+  from {
+    opacity: 0;
+    transform: translateY(20px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+/* KPI Card Enhancements */
+.kpi-card-modern {
+  background: linear-gradient(135deg, rgba(59, 130, 246, 0.1) 0%, rgba(96, 165, 250, 0.05) 100%);
+  border: 1px solid rgba(59, 130, 246, 0.3);
+  border-radius: 12px;
+  transition: all 0.3s ease;
+}
+
+.kpi-card-modern:hover {
+  background: linear-gradient(135deg, rgba(59, 130, 246, 0.15) 0%, rgba(96, 165, 250, 0.1) 100%);
+  border-color: rgba(59, 130, 246, 0.6);
+  box-shadow: 0 0 25px rgba(59, 130, 246, 0.2);
+  transform: translateY(-2px);
 }
 
 /* Gradient Text */

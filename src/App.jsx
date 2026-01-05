@@ -8,7 +8,14 @@ import KPICard from './components/ui/KPICard';
 import Loader, { SkeletonChart } from './components/ui/Loader';
 import { FilterProvider, useFilters } from './context/FilterContext';
 import useSessionData from './hooks/useSessionData';
-import { getGlobalKPIs, getSessionsByLanguage, getSessionsByService } from './utils/dataAggregations';
+import { getGlobalKPIs } from './utils/dataAggregations';
+import LanguagesChart from './components/charts/LanguagesChart';
+import SessionsEvolutionChart from './components/charts/SessionsEvolutionChart';
+import DurationChart from './components/charts/DurationChart';
+import ServicesChart from './components/charts/ServicesChart';
+import QualityChart from './components/charts/QualityChart';
+import InteractionsChart from './components/charts/InteractionsChart';
+import RatingsChart from './components/charts/RatingsChart';
 
 /**
  * Dashboard Content - Composant principal du dashboard
@@ -16,8 +23,6 @@ import { getGlobalKPIs, getSessionsByLanguage, getSessionsByService } from './ut
 const DashboardContent = () => {
   const { filteredSessions, filters, setFilters } = useFilters();
   const kpis = getGlobalKPIs(filteredSessions);
-  const topLangues = getSessionsByLanguage(filteredSessions).slice(0, 5);
-  const services = getSessionsByService(filteredSessions);
 
   return (
     <div className="flex flex-1 overflow-hidden">
@@ -27,98 +32,87 @@ const DashboardContent = () => {
         sessions={filteredSessions}
       />
 
-      <DashboardGrid>
-        {/* KPI Cards Row */}
-        <GridItem>
-          <KPICard
-            title="Total Sessions"
-            value={kpis.totalSessions}
-            icon="📊"
-            color="blue"
-          />
-        </GridItem>
+      {/* Dashboard optimisé - Meilleure configuration */}
+      <div className="flex-1 p-8 overflow-y-auto bg-gradient-to-br from-slate-900 via-slate-800 to-slate-900">
+        {/* Header élégant */}
+        <div className="text-center mb-12">
+          <h1 className="text-4xl font-bold bg-gradient-to-r from-blue-400 via-blue-300 to-blue-500 bg-clip-text text-transparent mb-2">
+            Dashaalia Analytics
+          </h1>
+          <p className="text-slate-400 text-sm">Plateforme d'interprétation médicale</p>
+        </div>
 
-        <GridItem>
-          <KPICard
-            title="Durée moyenne"
-            value={`${kpis.avgDuration} min`}
-            icon="⏱️"
-            color="purple"
-          />
-        </GridItem>
+        {/* KPIs principaux - Design amélioré */}
+        <div className="grid grid-cols-2 lg:grid-cols-4 gap-6 mb-12">
+          <div className="bg-gradient-to-br from-blue-500/10 to-blue-600/5 border border-blue-500/20 rounded-xl p-6 text-center hover:bg-blue-500/15 transition-all duration-300">
+            <div className="text-3xl font-bold text-blue-400 mb-2">{kpis.totalSessions}</div>
+            <div className="text-sm text-slate-400 uppercase tracking-wider font-medium">Sessions Totales</div>
+          </div>
+          <div className="bg-gradient-to-br from-green-500/10 to-green-600/5 border border-green-500/20 rounded-xl p-6 text-center hover:bg-green-500/15 transition-all duration-300">
+            <div className="text-3xl font-bold text-green-400 mb-2">{kpis.avgDuration}<span className="text-lg text-green-300">min</span></div>
+            <div className="text-sm text-slate-400 uppercase tracking-wider font-medium">Durée Moyenne</div>
+          </div>
+          <div className="bg-gradient-to-br from-purple-500/10 to-purple-600/5 border border-purple-500/20 rounded-xl p-6 text-center hover:bg-purple-500/15 transition-all duration-300">
+            <div className="text-3xl font-bold text-purple-400 mb-2">{kpis.avgQuality}<span className="text-lg text-purple-300">%</span></div>
+            <div className="text-sm text-slate-400 uppercase tracking-wider font-medium">Qualité Moyenne</div>
+          </div>
+          <div className="bg-gradient-to-br from-orange-500/10 to-orange-600/5 border border-orange-500/20 rounded-xl p-6 text-center hover:bg-orange-500/15 transition-all duration-300">
+            <div className="text-3xl font-bold text-orange-400 mb-2">{kpis.avgRating}<span className="text-lg text-orange-300">/5</span></div>
+            <div className="text-sm text-slate-400 uppercase tracking-wider font-medium">Note Moyenne</div>
+          </div>
+        </div>
 
-        <GridItem>
-          <KPICard
-            title="Score qualité"
-            value={`${kpis.avgQuality}%`}
-            icon="✨"
-            color="green"
-          />
-        </GridItem>
-
-        <GridItem>
-          <KPICard
-            title="Note moyenne"
-            value={`${kpis.avgRating}/5`}
-            icon="⭐"
-            color="amber"
-          />
-        </GridItem>
-
-        {/* Top Langues Card */}
-        <GridItem colSpan={2}>
-          <Card title="Top Langues" icon="🌍">
-            <div className="space-y-3">
-              {topLangues.map((lang, i) => (
-                <div key={lang.langue} className="flex items-center gap-3">
-                  <span className="w-6 h-6 flex items-center justify-center bg-blue-500/20 text-blue-400 rounded-full text-xs font-bold">
-                    {i + 1}
-                  </span>
-                  <span className="flex-1 text-white">{lang.langue}</span>
-                  <span className="text-blue-400 font-semibold">{lang.count}</span>
-                  <div className="w-24 bg-slate-700 rounded-full h-2">
-                    <div
-                      className="bg-gradient-to-r from-blue-500 to-purple-500 h-2 rounded-full"
-                      style={{ width: `${(lang.count / topLangues[0].count) * 100}%` }}
-                    />
-                  </div>
-                </div>
-              ))}
+        {/* Section Tendances - Charts principaux */}
+        <div className="mb-8">
+          <h2 className="text-xl font-semibold text-slate-200 mb-6 flex items-center">
+            <div className="w-1 h-6 bg-blue-500 rounded-full mr-3"></div>
+            Tendances & Évolution
+          </h2>
+          <div className="grid grid-cols-1 xl:grid-cols-3 gap-8">
+            <div className="xl:col-span-2 bg-slate-800/40 backdrop-blur-sm border border-slate-600/30 rounded-xl p-6 hover:bg-slate-800/50 transition-all duration-300">
+              <SessionsEvolutionChart />
             </div>
-          </Card>
-        </GridItem>
-
-        {/* Services Card */}
-        <GridItem colSpan={2}>
-          <Card title="Répartition Services" icon="🏥">
-            <div className="grid grid-cols-2 gap-2">
-              {services.map((service) => (
-                <div key={service.service} className="bg-slate-700/50 p-3 rounded-lg flex justify-between items-center">
-                  <span className="text-sm text-slate-300">{service.service}</span>
-                  <span className="text-purple-400 font-semibold">{service.percentage}%</span>
-                </div>
-              ))}
+            <div className="bg-slate-800/40 backdrop-blur-sm border border-slate-600/30 rounded-xl p-6 hover:bg-slate-800/50 transition-all duration-300">
+              <LanguagesChart />
             </div>
-          </Card>
-        </GridItem>
+          </div>
+        </div>
 
-        {/* Placeholder for future charts */}
-        <GridItem colSpan={2}>
-          <Card title="Évolution Sessions" icon="📈" className="h-64">
-            <div className="flex items-center justify-center h-40 text-slate-500">
-              📊 Graphique Phase 4
+        {/* Section Répartition & Qualité */}
+        <div className="mb-16">
+          <h2 className="text-xl font-semibold text-slate-200 mb-6 flex items-center">
+            <div className="w-1 h-6 bg-blue-500 rounded-full mr-3"></div>
+            Répartition & Qualité
+          </h2>
+          <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
+            <div className="bg-slate-800/40 backdrop-blur-sm border border-slate-600/30 rounded-xl p-6 hover:bg-slate-800/50 transition-all duration-300">
+              <ServicesChart />
             </div>
-          </Card>
-        </GridItem>
+            <div className="bg-slate-800/40 backdrop-blur-sm border border-slate-600/30 rounded-xl p-6 hover:bg-slate-800/50 transition-all duration-300">
+              <QualityChart />
+            </div>
+          </div>
+        </div>
 
-        <GridItem colSpan={2}>
-          <Card title="Indicateurs Qualité" icon="✨" className="h-64">
-            <div className="flex items-center justify-center h-40 text-slate-500">
-              📊 Graphique Phase 4
+        {/* Section Détails Opérationnels */}
+        <div className="mb-16">
+          <h2 className="text-xl font-semibold text-slate-200 mb-6 flex items-center">
+            <div className="w-1 h-6 bg-blue-500 rounded-full mr-3"></div>
+            Détails Opérationnels
+          </h2>
+          <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-6">
+            <div className="bg-slate-800/40 backdrop-blur-sm border border-slate-600/30 rounded-xl p-6 hover:bg-slate-800/50 transition-all duration-300">
+              <DurationChart />
             </div>
-          </Card>
-        </GridItem>
-      </DashboardGrid>
+            <div className="bg-slate-800/40 backdrop-blur-sm border border-slate-600/30 rounded-xl p-6 hover:bg-slate-800/50 transition-all duration-300">
+              <InteractionsChart />
+            </div>
+            <div className="bg-slate-800/40 backdrop-blur-sm border border-slate-600/30 rounded-xl p-6 hover:bg-slate-800/50 transition-all duration-300 md:col-span-2 xl:col-span-1">
+              <RatingsChart />
+            </div>
+          </div>
+        </div>
+      </div>
     </div>
   );
 };

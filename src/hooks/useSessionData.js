@@ -1,10 +1,11 @@
 import { useState, useEffect } from 'react';
-import { loadCSVFromURL } from '../utils/csvParser';
+import { parseCSV } from '../utils/csvParser';
+import csvData from '../data/sessions_dataset_320.csv?raw';
 
 /**
  * Hook pour charger et gérer les données de sessions
  */
-const useSessionData = (csvPath = '/src/data/sessions_dataset_320.csv') => {
+const useSessionData = () => {
     const [sessions, setSessions] = useState([]);
     const [loading, setLoading] = useState(true);
     const [error, setError] = useState(null);
@@ -14,7 +15,7 @@ const useSessionData = (csvPath = '/src/data/sessions_dataset_320.csv') => {
             try {
                 setLoading(true);
                 setError(null);
-                const data = await loadCSVFromURL(csvPath);
+                const data = parseCSV(csvData);
                 setSessions(data);
             } catch (err) {
                 console.error('Erreur chargement données:', err);
@@ -25,7 +26,7 @@ const useSessionData = (csvPath = '/src/data/sessions_dataset_320.csv') => {
         };
 
         loadData();
-    }, [csvPath]);
+    }, []);
 
     return { sessions, loading, error };
 };
