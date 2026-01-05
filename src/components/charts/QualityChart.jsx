@@ -22,6 +22,7 @@ const QualityChart = () => {
 
             {/* Gauge pour le score moyen */}
             <div className="w-full h-40 mb-4">
+                
                 <h4 className="text-sm font-medium mb-2 text-slate-300">Score de qualité moyen</h4>
                 <ResponsiveContainer width="100%" height="100%">
                     <PieChart>
