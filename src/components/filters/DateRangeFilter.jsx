@@ -1,9 +1,9 @@
 import { useState } from 'react';
 
 /**
- * DateRangeFilter - Filtre par plage de dates
+ * DateRangeFilter - Filtre par plage de dates (supporte le mode compact)
  */
-const DateRangeFilter = ({ startDate, endDate, onChange }) => {
+const DateRangeFilter = ({ startDate, endDate, onChange, compact = false }) => {
     const formatDateForInput = (date) => {
         if (!date) return '';
         return date.toISOString().split('T')[0];
@@ -21,12 +21,33 @@ const DateRangeFilter = ({ startDate, endDate, onChange }) => {
         onChange(startDate, newEnd);
     };
 
+    if (compact) {
+        return (
+            <div className="flex items-center gap-1">
+                <input
+                    type="date"
+                    value={formatDateForInput(startDate)}
+                    onChange={handleStartChange}
+                    className="px-2 py-1 bg-transparent border border-transparent hover:border-slate-600 rounded text-slate-300 text-[10px] focus:outline-none focus:border-sky-500 transition-colors cursor-pointer"
+                    title="Date de début"
+                />
+                <span className="text-slate-600 text-[10px]">-</span>
+                <input
+                    type="date"
+                    value={formatDateForInput(endDate)}
+                    onChange={handleEndChange}
+                    className="px-2 py-1 bg-transparent border border-transparent hover:border-slate-600 rounded text-slate-300 text-[10px] focus:outline-none focus:border-sky-500 transition-colors cursor-pointer"
+                    title="Date de fin"
+                />
+            </div>
+        );
+    }
+
     return (
         <div className="space-y-3">
             <label className="text-sm font-medium text-slate-300 flex items-center gap-2">
-                <span>📅</span> Période
+                Période
             </label>
-
             <div className="space-y-2">
                 <div>
                     <label className="text-xs text-slate-500">Du</label>
@@ -37,7 +58,6 @@ const DateRangeFilter = ({ startDate, endDate, onChange }) => {
                         className="w-full px-3 py-2 bg-slate-700 border border-slate-600 rounded-lg text-white text-sm focus:outline-none focus:border-blue-500 transition-colors"
                     />
                 </div>
-
                 <div>
                     <label className="text-xs text-slate-500">Au</label>
                     <input
@@ -48,8 +68,6 @@ const DateRangeFilter = ({ startDate, endDate, onChange }) => {
                     />
                 </div>
             </div>
-
-            {/* Quick Presets */}
             <div className="flex flex-wrap gap-1">
                 {[
                     { label: '7j', days: 7 },
@@ -69,12 +87,6 @@ const DateRangeFilter = ({ startDate, endDate, onChange }) => {
                         {label}
                     </button>
                 ))}
-                <button
-                    onClick={() => onChange(null, null)}
-                    className="px-2 py-1 text-xs bg-slate-600 hover:bg-slate-500 rounded text-slate-300 transition-colors"
-                >
-                    Tout
-                </button>
             </div>
         </div>
     );

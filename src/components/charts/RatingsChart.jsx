@@ -1,57 +1,62 @@
-import { useContext } from 'react';
-import { BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer } from 'recharts';
-import FilterContext from '../../context/FilterContext';
-import { getRatingDistribution } from '../../utils/dataAggregations';
-import KPICard from '../ui/KPICard';
+import React from 'react';
+import { BarChart, Bar, XAxis, Tooltip, ResponsiveContainer, Cell } from 'recharts';
 
 /**
- * Composant pour afficher les notes praticiens (histogramme + KPI)
+ * RatingsChart - CRM Style for Medical Intelligence
+ * Distribution of practitioner satisfaction ratings.
  */
-const RatingsChart = () => {
-    const { filteredSessions } = useContext(FilterContext);
-    const { avg, distribution } = getRatingDistribution(filteredSessions);
+const RatingsChart = ({ data = [] }) => {
+    // data is { avg, distribution }
+    const chartData = (data.distribution || []).map(d => ({
+        name: d.note,
+        value: d.count
+    }));
+
+    const CustomTooltip = ({ active, payload }) => {
+        if (active && payload && payload.length) {
+            return (
+                <div className="bg-[#1C1C24] border border-[#ffffff10] rounded-lg px-3 py-1.5 shadow-xl">
+                    <span className="text-sm font-bold text-white">{payload[0].value} <span className="text-[10px] text-gray-500 font-medium">avis ({payload[0].payload.name}★)</span></span>
+                </div>
+            );
+        }
+        return null;
+    };
 
     return (
-        <div className="chart-container p-4 chart-animation">
-            <h3 className="chart-title text-lg mb-3 text-center font-semibold text-slate-200">Notes praticiens</h3>
-
-            {/* KPI pour la moyenne */}
-            <div className="flex justify-center mb-4">
-                <div className="kpi-card-modern p-4 rounded-lg text-center min-w-[150px]">
-                    <div className="text-2xl font-bold text-blue-400 mb-1">{avg.toFixed(2)} / 5</div>
-                    <div className="text-sm text-slate-400">Note moyenne</div>
+        <div className="w-full h-full p-6 flex flex-col">
+            <div className="flex justify-between items-center mb-6">
+                <h3 className="text-white font-bold text-sm tracking-tight">Satisfaction Praticiens</h3>
+                <div className="flex items-center gap-1.5 px-2 py-1 bg-[#fbbf24]/10 rounded border border-[#fbbf24]/20">
+                    <span className="text-[10px] font-bold text-[#fbbf24] tracking-wider uppercase">Distribution</span>
                 </div>
             </div>
 
-            {/* Histogramme de distribution */}
-            <div className="w-full h-48">
-                <h4 className="text-sm font-medium mb-2 text-slate-300">Distribution des notes</h4>
+            <div className="flex-1">
                 <ResponsiveContainer width="100%" height="100%">
-                    <BarChart
-                        data={distribution}
-                        margin={{ top: 10, right: 20, left: 15, bottom: 10 }}
-                    >
-                        <CartesianGrid strokeDasharray="3 3" />
-                        <XAxis dataKey="note" fontSize={10} />
-                        <YAxis fontSize={10} />
-                        <Tooltip
-                            contentStyle={{
-                                background: 'linear-gradient(135deg, rgba(30, 41, 59, 0.95), rgba(51, 65, 85, 0.9))',
-                                border: '1px solid rgba(59, 130, 246, 0.5)',
-                                borderRadius: '6px',
-                                color: '#cbd5e1',
-                                fontSize: '12px'
-                            }}
+                    <BarChart data={chartData} margin={{ top: 0, right: 0, left: 0, bottom: 0 }}>
+                        <XAxis
+                            dataKey="name"
+                            axisLine={false}
+                            tickLine={false}
+                            tick={{ fill: '#6B7280', fontSize: 10 }}
+                            dy={5}
                         />
-                        <Bar dataKey="count" fill="url(#ratingGradient)" radius={[3, 3, 0, 0]} />
-                        <defs>
-                            <linearGradient id="ratingGradient" x1="0" y1="0" x2="0" y2="1">
-                                <stop offset="0%" stopColor="#06b6d4" />
-                                <stop offset="100%" stopColor="#22d3ee" />
-                            </linearGradient>
-                        </defs>
+                        <Tooltip content={<CustomTooltip />} cursor={{ fill: 'rgba(255,255,255,0.02)' }} />
+                        <Bar dataKey="value" radius={[4, 4, 4, 4]} barSize={20}>
+                            {chartData.map((entry, index) => {
+                                // Highlight high ratings
+                                const color = parseFloat(entry.name) >= 4 ? '#fbbf24' : '#6B7280';
+                                return <Cell key={`cell-${index}`} fill={color} fillOpacity={0.8} />;
+                            })}
+                        </Bar>
                     </BarChart>
                 </ResponsiveContainer>
+            </div>
+
+            <div className="mt-4 pt-3 border-t border-white/5 flex justify-between items-center">
+                <span className="text-[10px] text-gray-500">Moyenne pondérée</span>
+                <span className="text-xs font-bold text-white">{data.avg?.toFixed(2) || '0.00'}/5.0</span>
             </div>
         </div>
     );

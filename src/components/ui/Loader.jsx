@@ -1,54 +1,48 @@
+import React from 'react';
+
 /**
- * Loader - Composant de chargement animé
+ * Loader - Obsidian Analytics Loading Component
+ * Animated spinner with pulse effect
  */
 const Loader = ({ size = 'medium', text = 'Chargement...' }) => {
-    const sizeClasses = {
-        small: 'w-6 h-6',
-        medium: 'w-10 h-10',
+    const sizes = {
+        small: 'w-8 h-8',
+        medium: 'w-12 h-12',
         large: 'w-16 h-16'
     };
 
     return (
-        <div className="flex flex-col items-center justify-center gap-4 p-8">
-            {/* Spinner */}
-            <div className={`${sizeClasses[size]} relative`}>
-                <div className="absolute inset-0 border-4 border-slate-700 rounded-full"></div>
-                <div className="absolute inset-0 border-4 border-transparent border-t-blue-500 rounded-full animate-spin"></div>
-            </div>
-            {text && <p className="text-slate-400 text-sm">{text}</p>}
-        </div>
-    );
-};
+        <div className="flex flex-col items-center gap-5">
+            {/* Animated Spinner */}
+            <div className={`relative ${sizes[size]}`}>
+                {/* Outer ring */}
+                <div className="absolute inset-0 rounded-full border-2 border-zinc-800"></div>
 
-/**
- * SkeletonCard - Placeholder animé pour les cartes
- */
-export const SkeletonCard = ({ height = 'h-48' }) => {
-    return (
-        <div className={`glass-card p-5 ${height} animate-pulse`}>
-            <div className="h-4 bg-slate-700 rounded w-1/3 mb-4"></div>
-            <div className="h-8 bg-slate-700 rounded w-2/3 mb-2"></div>
-            <div className="h-4 bg-slate-700 rounded w-1/2"></div>
-        </div>
-    );
-};
+                {/* Spinning gradient ring */}
+                <div className="absolute inset-0 rounded-full border-2 border-transparent border-t-cyan-400 border-r-violet-400 animate-spin"></div>
 
-/**
- * SkeletonChart - Placeholder animé pour les graphiques
- */
-export const SkeletonChart = ({ height = 'h-64' }) => {
-    return (
-        <div className={`glass-card p-5 ${height} animate-pulse`}>
-            <div className="h-4 bg-slate-700 rounded w-1/4 mb-4"></div>
-            <div className="flex items-end gap-2 h-3/4">
-                {[60, 80, 45, 90, 70, 55, 85].map((h, i) => (
-                    <div
-                        key={i}
-                        className="flex-1 bg-slate-700 rounded-t"
-                        style={{ height: `${h}%` }}
-                    ></div>
-                ))}
+                {/* Inner glow */}
+                <div className="absolute inset-2 rounded-full bg-gradient-to-br from-cyan-500/20 to-violet-500/20 animate-pulse"></div>
+
+                {/* Center dot */}
+                <div className="absolute inset-0 flex items-center justify-center">
+                    <div className="w-2 h-2 rounded-full bg-cyan-400 animate-pulse shadow-[0_0_10px_rgba(34,211,238,0.8)]"></div>
+                </div>
             </div>
+
+            {/* Loading text */}
+            {text && (
+                <div className="flex flex-col items-center gap-1">
+                    <span className="text-sm font-medium text-white tracking-wide">
+                        {text}
+                    </span>
+                    <div className="flex gap-1">
+                        <span className="w-1.5 h-1.5 rounded-full bg-cyan-400 animate-bounce" style={{ animationDelay: '0ms' }}></span>
+                        <span className="w-1.5 h-1.5 rounded-full bg-violet-400 animate-bounce" style={{ animationDelay: '150ms' }}></span>
+                        <span className="w-1.5 h-1.5 rounded-full bg-cyan-400 animate-bounce" style={{ animationDelay: '300ms' }}></span>
+                    </div>
+                </div>
+            )}
         </div>
     );
 };

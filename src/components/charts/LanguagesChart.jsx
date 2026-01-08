@@ -1,46 +1,94 @@
-import { useContext } from 'react';
-import { BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer } from 'recharts';
-import FilterContext from '../../context/FilterContext';
-import { getSessionsByLanguage } from '../../utils/dataAggregations';
+import React, { useState } from 'react';
+import { BarChart, Bar, XAxis, YAxis, Tooltip, ResponsiveContainer, Cell } from 'recharts';
 
 /**
- * Composant pour afficher le top des langues (bar chart horizontal)
+ * LanguagesChart - CRM Style for Medical Intelligence
+ * Horizontal bar chart for linguistic analysis.
  */
-const LanguagesChart = () => {
-    const { filteredSessions } = useContext(FilterContext);
-    const data = getSessionsByLanguage(filteredSessions);
+const LanguagesChart = ({ data = [] }) => {
+    const [activeIndex, setActiveIndex] = useState(null);
+
+    // Take top 5 languages
+    const chartData = data.slice(0, 5).map(d => ({
+        name: d.langue,
+        value: d.count
+    }));
+
+    const maxValue = Math.max(...chartData.map(d => d.value), 1);
+
+    const CustomTooltip = ({ active, payload }) => {
+        if (active && payload && payload.length) {
+            return (
+                <div className="bg-[#1C1C24] border border-[#ffffff10] rounded-xl px-3 py-2 shadow-xl">
+                    <p className="text-[10px] text-gray-400 uppercase font-bold">{payload[0].payload.name}</p>
+                    <p className="text-sm font-bold text-white">{payload[0].value} <span className="text-[10px] text-gray-500 font-medium">sessions</span></p>
+                </div>
+            );
+        }
+        return null;
+    };
 
     return (
-        <div className="chart-container p-4 chart-animation">
-            <h3 className="chart-title text-lg mb-3 text-center font-semibold text-slate-200">Top des langues</h3>
-            <ResponsiveContainer width="100%" height={280}>
-                <BarChart
-                    data={data}
-                    layout="horizontal"
-                    margin={{ top: 10, right: 20, left: 15, bottom: 10 }}
-                >
-                    <CartesianGrid strokeDasharray="3 3" />
-                    <XAxis type="number" />
-                    <YAxis dataKey="langue" type="category" width={70} fontSize={11} />
-                    <Tooltip
-                        contentStyle={{
-                            background: 'linear-gradient(135deg, rgba(30, 41, 59, 0.95), rgba(51, 65, 85, 0.9))',
-                            border: '1px solid rgba(59, 130, 246, 0.5)',
-                            borderRadius: '6px',
-                            color: '#cbd5e1',
-                            fontSize: '12px'
+        <div className="w-full h-full p-6 flex flex-col">
+            <div className="flex justify-between items-start mb-4">
+                <div>
+                    <h3 className="text-white font-bold text-sm tracking-tight">Analyse Linguistique</h3>
+                    <p className="text-[10px] text-gray-500 mt-0.5">Top 5 des langues sollicitées</p>
+                </div>
+                <div className="text-[10px] font-bold text-gray-500 uppercase tracking-widest px-2 py-1 bg-white/5 rounded">
+                    Global
+                </div>
+            </div>
+
+            <div className="flex-1 min-h-0">
+                <ResponsiveContainer width="100%" height="100%">
+                    <BarChart
+                        layout="vertical"
+                        data={chartData}
+                        margin={{ top: 5, right: 30, left: 10, bottom: 5 }}
+                        onMouseMove={(state) => {
+                            if (state.activeTooltipIndex !== undefined) {
+                                setActiveIndex(state.activeTooltipIndex);
+                            }
                         }}
-                    />
-                    <Bar dataKey="count" fill="url(#colorfulGradient)" radius={[0, 3, 3, 0]} />
-                    <defs>
-                        <linearGradient id="colorfulGradient" x1="0" y1="0" x2="1" y2="0">
-                            <stop offset="0%" stopColor="#3b82f6" />
-                            <stop offset="50%" stopColor="#10b981" />
-                            <stop offset="100%" stopColor="#8b5cf6" />
-                        </linearGradient>
-                    </defs>
-                </BarChart>
-            </ResponsiveContainer>
+                        onMouseLeave={() => setActiveIndex(null)}
+                    >
+                        <XAxis type="number" hide />
+                        <YAxis
+                            type="category"
+                            dataKey="name"
+                            axisLine={false}
+                            tickLine={false}
+                            tick={{ fill: '#fff', fontSize: 11, fontWeight: 600 }}
+                            width={80}
+                        />
+                        <Tooltip content={<CustomTooltip />} cursor={{ fill: 'rgba(255,255,255,0.02)' }} />
+                        <Bar
+                            dataKey="value"
+                            radius={[0, 4, 4, 0]}
+                            barSize={18}
+                        >
+                            {chartData.map((entry, index) => {
+                                const opacity = activeIndex === null || activeIndex === index ? 1 : 0.3;
+                                return (
+                                    <Cell
+                                        key={`cell-${index}`}
+                                        fill={index % 2 === 0 ? '#22D3EE' : '#8F48F8'}
+                                        fillOpacity={opacity}
+                                        style={{ transition: 'fill-opacity 0.3s ease' }}
+                                    />
+                                );
+                            })}
+                        </Bar>
+                    </BarChart>
+                </ResponsiveContainer>
+            </div>
+
+            {/* Legend / Info */}
+            <div className="mt-4 flex justify-between items-center text-[10px] text-gray-500">
+                <span>Volume total par idiome</span>
+                <span className="text-gray-400 italic">Trié par fréquence</span>
+            </div>
         </div>
     );
 };

@@ -1,40 +1,39 @@
 import React, { useState } from 'react';
 import { PieChart, Pie, Cell, ResponsiveContainer, Sector } from 'recharts';
 
-const COLORS = ['#22D3EE', '#3B82F6', '#8F48F8', '#D255D1', '#6366F1'];
+const COLORS = ['#22D3EE', '#3B82F6', '#8F48F8', '#D255D1', '#06B6D4'];
 
 /**
- * ServicesChart - CRM Style for Medical Intelligence
- * Distribution of medical sessions by service/department.
+ * TicketTypeChart - Interactive donut with real service data
  */
-const ServicesChart = ({ data = [] }) => {
+const TicketTypeChart = ({ data = [] }) => {
     const [activeIndex, setActiveIndex] = useState(null);
 
     // Transform service data
     const chartData = data.slice(0, 5).map((d, idx) => ({
         name: d.service,
         value: d.count,
-        percentage: d.percentage,
         color: COLORS[idx % COLORS.length]
     }));
 
     const renderActiveShape = (props) => {
-        const { cx, cy, innerRadius, outerRadius, startAngle, endAngle, fill, payload, value, percentage } = props;
+        const { cx, cy, innerRadius, outerRadius, startAngle, endAngle, fill, payload, value } = props;
         return (
             <g>
                 <Sector
                     cx={cx}
                     cy={cy}
                     innerRadius={innerRadius}
-                    outerRadius={outerRadius + 6}
+                    outerRadius={outerRadius + 8}
                     startAngle={startAngle}
                     endAngle={endAngle}
                     fill={fill}
+                    style={{ filter: `drop-shadow(0 0 8px ${fill}80)` }}
                 />
-                <text x={cx} y={cy - 8} textAnchor="middle" fill="#fff" fontSize={16} fontWeight="bold">
-                    {percentage}%
+                <text x={cx} y={cy - 10} textAnchor="middle" fill="#fff" fontSize={18} fontWeight="bold">
+                    {value}
                 </text>
-                <text x={cx} y={cy + 12} textAnchor="middle" fill="#6B7280" fontSize={9} fontWeight="bold" className="uppercase tracking-widest">
+                <text x={cx} y={cy + 10} textAnchor="middle" fill="#6B7280" fontSize={10}>
                     {payload.name}
                 </text>
             </g>
@@ -43,10 +42,11 @@ const ServicesChart = ({ data = [] }) => {
 
     return (
         <div className="w-full h-full p-6 flex flex-col">
-            <h3 className="text-white font-bold text-sm mb-4">Répartition par Service</h3>
+            <h3 className="text-white font-bold text-sm mb-2">Sessions by Service</h3>
+            <p className="text-[10px] text-gray-500 mb-4">Top 5 services</p>
 
-            <div className="flex-1 flex items-center gap-2">
-                <ResponsiveContainer width="60%" height="100%">
+            <div className="flex-1 flex items-center">
+                <ResponsiveContainer width="55%" height="100%">
                     <PieChart>
                         <Pie
                             data={chartData}
@@ -54,7 +54,7 @@ const ServicesChart = ({ data = [] }) => {
                             cy="50%"
                             innerRadius={45}
                             outerRadius={65}
-                            paddingAngle={4}
+                            paddingAngle={2}
                             dataKey="value"
                             stroke="none"
                             activeIndex={activeIndex}
@@ -69,19 +69,19 @@ const ServicesChart = ({ data = [] }) => {
                     </PieChart>
                 </ResponsiveContainer>
 
-                <div className="flex-1 flex flex-col gap-2.5">
+                <div className="flex flex-col gap-2">
                     {chartData.map((item, idx) => (
                         <div
                             key={item.name}
-                            className={`flex items-center gap-3 cursor-pointer transition-all ${activeIndex !== null && activeIndex !== idx ? 'opacity-30' : 'opacity-100'}`}
+                            className={`flex items-center gap-2 cursor-pointer transition-opacity ${activeIndex !== null && activeIndex !== idx ? 'opacity-40' : 'opacity-100'}`}
                             onMouseEnter={() => setActiveIndex(idx)}
                             onMouseLeave={() => setActiveIndex(null)}
                         >
-                            <div className="w-2 h-2 rounded-full" style={{ backgroundColor: item.color }}></div>
-                            <div className="flex flex-col">
-                                <span className="text-[10px] text-gray-300 font-bold truncate max-w-[80px] leading-tight">{item.name}</span>
-                                <span className="text-[9px] text-gray-500 font-medium">{item.value} sessions</span>
-                            </div>
+                            <div
+                                className="w-2.5 h-2.5 rounded-full"
+                                style={{ backgroundColor: item.color }}
+                            ></div>
+                            <span className="text-xs text-gray-300 font-medium truncate max-w-[80px]">{item.name}</span>
                         </div>
                     ))}
                 </div>
@@ -90,4 +90,4 @@ const ServicesChart = ({ data = [] }) => {
     );
 };
 
-export default ServicesChart;
+export default TicketTypeChart;

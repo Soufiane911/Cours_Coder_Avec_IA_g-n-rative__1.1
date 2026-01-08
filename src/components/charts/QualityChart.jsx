@@ -1,81 +1,90 @@
 import { useContext } from 'react';
-import { PieChart, Pie, Cell, ScatterChart, Scatter, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer } from 'recharts';
+import { PieChart, Pie, Cell, ResponsiveContainer } from 'recharts';
 import FilterContext from '../../context/FilterContext';
 import { getQualityMetrics } from '../../utils/dataAggregations';
 
 /**
- * Composant pour afficher les indicateurs qualité (gauge + scatter plot)
+ * QualityChart - Obsidian Analytics Gauge
+ * Semi-circular gauge with emerald glow
  */
 const QualityChart = () => {
     const { filteredSessions } = useContext(FilterContext);
     const metrics = getQualityMetrics(filteredSessions);
+    const scoreValue = metrics.avgScore * 100;
 
-    // Données pour le gauge (score moyen)
-    const gaugeData = [
-        { name: 'Score', value: metrics.avgScore * 100, fill: '#00C49F' },
-        { name: 'Rest', value: 100 - (metrics.avgScore * 100), fill: '#F0F0F0' }
+    const data = [
+        { name: 'Score', value: scoreValue },
+        { name: 'Rest', value: 100 - scoreValue }
     ];
 
-    return (
-        <div className="chart-container p-4 chart-animation">
-            <h3 className="chart-title text-lg mb-3 text-center font-semibold text-slate-200">Indicateurs qualité</h3>
+    // Determine status based on score
+    const getStatus = (score) => {
+        if (score >= 90) return { label: 'EXCELLENT', color: 'emerald' };
+        if (score >= 70) return { label: 'BON', color: 'cyan' };
+        if (score >= 50) return { label: 'MOYEN', color: 'amber' };
+        return { label: 'FAIBLE', color: 'rose' };
+    };
 
-            {/* Gauge pour le score moyen */}
-            <div className="w-full h-40 mb-4">
-                
-                <h4 className="text-sm font-medium mb-2 text-slate-300">Score de qualité moyen</h4>
-                <ResponsiveContainer width="100%" height="100%">
-                    <PieChart>
-                        <Pie
-                            data={gaugeData}
-                            cx="50%"
-                            cy="50%"
-                            startAngle={180}
-                            endAngle={0}
-                            innerRadius={35}
-                            outerRadius={55}
-                            paddingAngle={5}
-                            dataKey="value"
-                        >
-                            <Cell fill="url(#gaugeGradient)" />
-                            <Cell fill="rgba(71, 85, 105, 0.3)" />
-                        </Pie>
-                        <text x="50%" y="50%" textAnchor="middle" dominantBaseline="middle" fontSize="14" fontWeight="bold" fill="#cbd5e1">
-                            {`${(metrics.avgScore * 100).toFixed(1)}%`}
-                        </text>
-                        <defs>
-                            <linearGradient id="gaugeGradient" x1="0" y1="0" x2="1" y2="1">
-                                <stop offset="0%" stopColor="#10b981" />
-                                <stop offset="100%" stopColor="#34d399" />
-                            </linearGradient>
-                        </defs>
-                    </PieChart>
-                </ResponsiveContainer>
+    const status = getStatus(scoreValue);
+
+    return (
+        <div className="w-full h-full p-6 flex flex-col">
+            {/* Header */}
+            <div className="mb-2">
+                <h3 className="text-sm font-semibold text-white tracking-wide uppercase">
+                    Indice Qualité IA
+                </h3>
+                <p className="text-xs text-zinc-500 mt-0.5">Précision algorithmique</p>
             </div>
 
-            {/* Scatter plot pour corrélation durée vs qualité */}
-            <div className="w-full h-48">
-                <h4 className="text-sm font-medium mb-2 text-slate-300">Corrélation durée vs qualité</h4>
-                <ResponsiveContainer width="100%" height="100%">
-                    <ScatterChart
-                        margin={{ top: 15, right: 15, bottom: 15, left: 15 }}
-                    >
-                        <CartesianGrid strokeDasharray="3 3" />
-                        <XAxis type="number" dataKey="duree" name="Durée (min)" fontSize={10} />
-                        <YAxis type="number" dataKey="qualite" name="Qualité" domain={[0, 1]} fontSize={10} />
-                        <Tooltip
-                            contentStyle={{
-                                background: 'linear-gradient(135deg, rgba(30, 41, 59, 0.95), rgba(51, 65, 85, 0.9))',
-                                border: '1px solid rgba(59, 130, 246, 0.5)',
-                                borderRadius: '6px',
-                                color: '#cbd5e1',
-                                fontSize: '12px'
-                            }}
-                            cursor={{ strokeDasharray: '3 3' }}
-                        />
-                        <Scatter name="Sessions" data={metrics.correlation} fill="#f97316" />
-                    </ScatterChart>
-                </ResponsiveContainer>
+            {/* Gauge */}
+            <div className="flex-1 relative flex items-center justify-center">
+                <div className="w-full h-full max-w-[280px]">
+                    <ResponsiveContainer width="100%" height="100%">
+                        <PieChart>
+                            <defs>
+                                <linearGradient id="gaugeGradient" x1="0" y1="0" x2="1" y2="0">
+                                    <stop offset="0%" stopColor="#34d399" />
+                                    <stop offset="100%" stopColor="#22d3ee" />
+                                </linearGradient>
+                            </defs>
+                            <Pie
+                                data={data}
+                                cx="50%"
+                                cy="70%"
+                                startAngle={180}
+                                endAngle={0}
+                                innerRadius="60%"
+                                outerRadius="90%"
+                                paddingAngle={0}
+                                dataKey="value"
+                                stroke="none"
+                            >
+                                <Cell
+                                    fill="url(#gaugeGradient)"
+                                    style={{ filter: 'drop-shadow(0 0 12px rgba(52, 211, 153, 0.5))' }}
+                                />
+                                <Cell fill="rgba(39, 39, 42, 0.8)" />
+                            </Pie>
+                        </PieChart>
+                    </ResponsiveContainer>
+                </div>
+
+                {/* Center Value */}
+                <div className="absolute inset-0 flex flex-col items-center justify-center pt-6">
+                    <span className="text-4xl font-bold text-white font-mono tracking-tight">
+                        {scoreValue.toFixed(1)}%
+                    </span>
+                    <span className={`
+                        text-[10px] font-bold uppercase tracking-wider mt-2 px-3 py-1 rounded-full
+                        ${status.color === 'emerald' ? 'bg-emerald-500/15 text-emerald-400 border border-emerald-500/30' : ''}
+                        ${status.color === 'cyan' ? 'bg-cyan-500/15 text-cyan-400 border border-cyan-500/30' : ''}
+                        ${status.color === 'amber' ? 'bg-amber-500/15 text-amber-400 border border-amber-500/30' : ''}
+                        ${status.color === 'rose' ? 'bg-rose-500/15 text-rose-400 border border-rose-500/30' : ''}
+                    `}>
+                        {status.label}
+                    </span>
+                </div>
             </div>
         </div>
     );
