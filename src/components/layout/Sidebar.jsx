@@ -4,7 +4,7 @@ import React, { useState } from 'react';
  * Sidebar - Simplified and logical navigation for Dashaalia
  * Sections: Vue Principale, Expertise IA, Outils
  */
-const Sidebar = ({ active = 'Dashboard', activeServices = [], onNavigate, hasActiveFilters, onResetFilters }) => {
+const Sidebar = ({ active = 'Dashboard', activeServices = [], onNavigate, hasActiveFilters, onResetFilters, onExportPDF }) => {
     const [hoveredItem, setHoveredItem] = useState(null);
 
     const menuGroups = [
@@ -127,8 +127,11 @@ const Sidebar = ({ active = 'Dashboard', activeServices = [], onNavigate, hasAct
                     </button>
                 )}
 
-                <button className="w-full bg-[#1C1C24] text-white text-[11px] font-bold py-3 rounded-xl border border-white/5 hover:bg-[#2A2A35] transition-all flex items-center justify-center gap-2">
-                    <svg className="w-4 h-4 text-[#CF57D3]" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 10v6m0 0l-3-3m3 3l3-3m2 8H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" /></svg>
+                <button
+                    onClick={onExportPDF}
+                    className="w-full bg-[#1C1C24] text-white text-[11px] font-bold py-3 rounded-xl border border-white/5 hover:bg-[#2A2A35] transition-all flex items-center justify-center gap-2 print:hidden"
+                >
+                    <svg className="w-4 h-4 text-[#CF57D3]" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 10v6m0 0l-3-3m3 3l3-3m2 8H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 2 0 01.707.293l5.414 5.414a1 2 0 01.293.707V19a2 2 0 01-2 2z" /></svg>
                     Exporter PDF
                 </button>
             </div>

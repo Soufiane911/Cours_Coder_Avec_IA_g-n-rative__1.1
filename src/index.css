@@ -71,3 +71,61 @@ body {
   width: 0px;
   background: transparent;
 }
+
+/* === PRINT OPTIMIZATION === */
+@media print {
+  @page {
+    size: auto;
+    margin: 10mm;
+  }
+
+  body {
+    background: #FFFFFF !important;
+    color: #121216 !important;
+    overflow: visible !important;
+    height: auto !important;
+  }
+
+  aside, 
+  .print\:hidden,
+  button,
+  .sidebar-container {
+    display: none !important;
+  }
+
+  main {
+    padding: 0 !important;
+    margin: 0 !important;
+    height: auto !important;
+    overflow: visible !important;
+    width: 100% !important;
+    background: transparent !important;
+  }
+
+  .bg-\[\#1C1C24\], 
+  .bg-\[\#121216\],
+  .bg-white\/\[0\.01\] {
+    background-color: #F9FAFB !important;
+    border-color: #E5E7EB !important;
+    color: #1F2937 !important;
+    box-shadow: none !important;
+  }
+
+  h2, h3, h4, p, span {
+    color: #111827 !important;
+  }
+
+  /* Force display charts if they use SVG */
+  svg {
+    max-width: 100% !important;
+  }
+
+  .grid {
+    display: block !important;
+  }
+
+  .grid > div {
+    margin-bottom: 20px !important;
+    break-inside: avoid;
+  }
+}

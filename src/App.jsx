@@ -354,6 +354,10 @@ const DashboardContent = () => {
         updateFilter('devices', newDevs);
     };
 
+    const handleExportPDF = () => {
+        window.print();
+    };
+
     const renderCurrentView = () => {
         switch (activeView) {
             case 'Dashboard':
@@ -377,6 +381,7 @@ const DashboardContent = () => {
                 onNavigate={handleNavigation}
                 hasActiveFilters={hasActiveFilters}
                 onResetFilters={resetFilters}
+                onExportPDF={handleExportPDF}
             />
 
             <main className="flex-1 h-screen overflow-hidden p-8 flex flex-col gap-6">
