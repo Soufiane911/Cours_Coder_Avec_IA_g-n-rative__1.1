@@ -21,23 +21,7 @@ Ce dépôt contient le développement d'une solution de Business Intelligence (B
 - **Moteur Graphique** : Recharts (alternativement Chart.js ou Nivo)
 - **Framework CSS** : Tailwind CSS (Méthodologie Utility-First)
 - **Parsing de Données** : PapaParse
-- **Gestion d'État** : React Context API / Zustand
 
-### Structure de l'Information (Dataset)
-Le système traite le fichier `sessions_dataset_320.csv` comprenant les attributs suivants :
-
-| Attribut | Type | Description |
-|----------|------|-------------|
-| session_id | String | Identifiant unique de transaction |
-| date | Date | Date de l'événement (ISO 8601) |
-| service | String | Département médical concerné |
-| langue | String | Idiome utilisé par le patient |
-| duree_minutes | Float | Temps de session effectif |
-| interactions_patient | Integer | Volume d'entrées patient |
-| interactions_praticien | Integer | Volume d'entrées praticien |
-| note_praticien | Float | Évaluation qualitative (échelle 1.0 - 5.0) |
-| qualite_score | Float | Indice de précision IA (0.0 - 1.0) |
-| device | String | Interface d'accès (webapp / mobile) |
 
 ## 4. Architecture Logicielle
 
@@ -98,10 +82,3 @@ npx tailwindcss init -p
 npm run dev
 ```
 
-## 7. Livrables et Évaluation
-
-Le projet sera évalué sur la rigueur de l'implémentation, la propreté du code source et l'exactitude des calculs statistiques. Un rapport technique de 3 à 5 pages doit accompagner le code, documentant :
-- La répartition des contributions techniques.
-- La justification des bibliothèques choisies.
-- L'utilisation documentée des outils d'IA générative dans le processus de développement.
-- L'analyse des résultats obtenus et les axes d'optimisation futurs.
